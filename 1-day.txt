@@ -1,0 +1,31 @@
+#!/bin/bash
+BACKUP_DIR="/tmp/backup"
+BACKUP_FILE="${BACKUP_DIR}/system_health_$(date +%Y%m%d%H%M%S).txt"
+EMAIL="your_email@example.com"
+mkdir -p $BACKUP_DIR
+
+echo "provide the option"
+echo "a Check Disk Usage"
+echo "b Monitor Running Services"
+echo "c Assess Memory Usage"
+echo "d cpu usage"
+echo "e  Send a repot in Email"
+read choice
+
+case $choice in
+        a) df -h;;
+        b) systemctl --type=service --state=running;;
+        c) ps;;
+        d) free -m;;
+        e) echo "storage..........................."; $BACKUP_FILE 
+           df -h >> $BACKUP_FILE
+           echo "memory............................"; $BACKUP_FILE
+           top -b -n 1 | head -n 15 >> $BACKUP_FILE
+           echo "processes......................... "; $BACKUP_FILE
+           ps aux >> $BACKUP_FILE
+           systemctl --type=service --state=running >> $BACKUP_FILE;;
+           #mailx -s "System Health Report" -a $BACKUP_FILE $EMAIL;;
+
+        *) echo "please provide the value"
+
+esac
